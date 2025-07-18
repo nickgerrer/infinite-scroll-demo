@@ -1,5 +1,5 @@
 import { type BreadcrumbItem, type SharedData } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
+import { Head, router, usePage, WhenVisible } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@radix-ui/react-select';
@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { ChevronDown } from "lucide-react"
 import AppHeaderLayout from '@/layouts/app/app-header-layout';
 import AppGuestHeaderLayout from '@/layouts/app/app-guest-header-layout';
+import { Button } from '@/components/ui/button';
 
 export interface User {
     id: number;
@@ -208,7 +209,7 @@ export function UnifiedLayout({ children, breadcrumbs = [] }: UnifiedLayoutProps
     );
 }
 
-export default function Posts({ posts }: { posts: PostWithRelations[] }) {
+export default function Posts({ posts, pagination }: { posts: PostWithRelations[], pagination: Omit<PaginatedPosts, 'data'> }) {
     return (
         <UnifiedLayout breadcrumbs={breadcrumbs}>
             <Head title="Posts" />
@@ -217,6 +218,17 @@ export default function Posts({ posts }: { posts: PostWithRelations[] }) {
                     <PostCard key={post.id} post={post} />
                 ))}
             </div>
+            <WhenVisible
+                always={pagination.current_page <= pagination.last_page}
+                params={{
+                    only: ['posts', 'pagination'],
+                    data: {
+                        page: pagination.current_page + 1,
+                    }
+                }}
+                fallback={<div>Loading..</div>}>
+                <span>You have reached the end of the posts</span>
+            </WhenVisible>
         </UnifiedLayout>
     );
 }

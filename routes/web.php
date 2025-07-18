@@ -13,10 +13,11 @@ Route::get('/', function () {
         'comments.user',
         'comments.replies.user',
         'comments.replies.replies.user'
-    ])->get();
+    ])->paginate(5);
 
     return Inertia::render('posts', [
-        'posts' => $posts
+        'posts' => Inertia::merge($posts->items()),
+        'pagination' => Arr::except($posts->toArray(), ['data'])
     ]);
 })->name('posts');
 
